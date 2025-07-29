@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/vishalsingh800/ecommerce-website.git'
+                git branch: 'main', url: 'https://github.com/vishalsingh800/ecommerce-website.git'
             }
         }
 
@@ -28,4 +28,5 @@ pipeline {
         }
     }
 }
+
 
