@@ -2,53 +2,27 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "vishalsingh800/ecommerce-website"
-        DOCKER_CREDENTIALS_ID = "dockerhub-creds" // Set this in Jenkins
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
 
     stages {
-        stage('Clone') {
-            steps {
-                git 'https://github.com/vishalsingh800/ecommerce-website.git'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh 'mvn clean install'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                script {
-                    dockerImage = docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
-                }
-            }
-        }
-
-        stage('Docker Push') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    script {
-                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-                        sh "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
-                    }
-                }
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
+        stage('Docker Login') {
             steps {
                 sh '''
-                    kubectl set image deployment/ecommerce-deployment ecommerce-container=${DOCKER_IMAGE}:${BUILD_NUMBER} --record
+                    echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin
                 '''
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t vishalsingh800/ecommerce-app .'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                sh 'docker push vishalsingh800/ecommerce-app'
             }
         }
     }
