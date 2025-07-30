@@ -4,7 +4,9 @@ pipeline {
   environment {
     DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
   }
-
+  environment {
+  GITHUB_CREDENTIALS = credentials('github-token')
+}
   stages {
     stage('Checkout') {
       steps {
