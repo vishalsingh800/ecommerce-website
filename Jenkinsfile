@@ -1,32 +1,38 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
-  stages {
-    stage('Checkout') {
-      steps {
-        git url: 'https://github.com/vishalsingh800/ecommerce-website.git', branch: 'main'
-      }
+    environment {
+        DOCKER_IMAGE = 'vishalsingh800/ecommerce-app'
+        DOCKER_TAG = 'latest'
     }
 
-    stage('Docker Login') {
-      steps {
-        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-      }
-    }
+    stages {
+        stage('Clone') {
+            steps {
+                git 'https://github.com/vishalsingh800/ecommerce-website.git'
+            }
+        }
 
-    stage('Build Docker Image') {
-      steps {
-        sh 'docker build -t vishalsingh800/ecommerce-app .'
-      }
-    }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+            }
+        }
 
-    stage('Push to Docker Hub') {
-      steps {
-        sh 'docker push vishalsingh800/ecommerce-app'
-      }
+        stage('Login to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push $DOCKER_IMAGE:$DOCKER_TAG'
+            }
+        }
     }
-  }
 }
+
 
