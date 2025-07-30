@@ -7,15 +7,9 @@ pipeline {
     }
 
     stages {
-        stage('Clone') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/vishalsingh800/ecommerce-website.git'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
             }
         }
 
@@ -24,6 +18,12 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
             }
         }
 
