@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git:branch: 'main', 'https://github.com/vishalsingh800/ecommerce-website.git'
+                git: 'https://github.com/vishalsingh800/ecommerce-website.git'
             }
         }
 
