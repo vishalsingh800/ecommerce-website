@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'vishalsingh800/ecommerce-app'
+        DOCKER_IMAGE = 'vishalsingh800/ecommerce-website'
         DOCKER_TAG = 'latest'
     }
 
